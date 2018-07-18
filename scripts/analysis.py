@@ -150,6 +150,10 @@ def get_combined_day_births(datafile):
 	fig = go.Figure(data=data, layout=layout)
 	plotly.offline.plot(fig, filename='datetime-heatmap')
 
+	sums = []
+	sums = [sum(z_sub) for z_sub in z]
+	pprint(sums)
+
 	# births = {month: births[month]/100000 for month in births}
 	# lists = births.items() # sorted by key, return a list of tuples
 	# x, y = zip(*lists) # unpack a list of pairs into two tuples
