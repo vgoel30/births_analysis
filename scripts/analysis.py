@@ -11,6 +11,7 @@ from math import log as ln
 import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
+import plotly.figure_factory as ff
 
 def get_year_distribution(datafile, year):
 	year = str(year)
@@ -117,6 +118,8 @@ def get_combined_day_births(datafile):
 	z = []
 	i = 0
 
+	rank_list = []
+
 	for month in births:
 		i += 1
 		month_data = births[i]
@@ -124,27 +127,50 @@ def get_combined_day_births(datafile):
 		for date in date_list:
 			if date in month_data:
 				new_row.append(month_data[date])
+				rank_list.append(month_data[date])
 			else:
 				new_row.append(0)
+				rank_list.append(0)
 		z.append(new_row)
 
-	z[1][28] *= 4
+	#z[1][28] *= 4
 
-	#pprint(z)
+	#pprint(z[11])
+	#exit()
+	rank_list.sort()
+	rank_list = rank_list[::-1]
+	# pprint(rank_list)
+	# exit()
+
+	hovertext = list()
+	pprint(months)
+	pprint(date_list)
+	for month in months:
+		hovertext.append(list())
+		month_data = z[months.index(month)]
+		for date_val in date_list:
+			birth_count = month_data[int(date_val) - 1]
+			pprint(month)
+			pprint(date_val)
+			pprint(birth_count)
+			to_append = 'Month: ' + str(month) + '<br />Date: ' + str(date_val) + '<br />Births: ' + str(birth_count) + '<br />Rank: ' + str(rank_list.index(birth_count) + 1)
+			hovertext[-1].append(to_append)
 
 	data = [
-    go.Heatmap(
-        z=z,
-        x=date_list,
-        y=months,
-        colorscale='Jet',
-    	)
+	go.Heatmap(
+		z=z,
+		x=date_list,
+		y=months,
+		colorscale='Jet',
+		hoverinfo='text',
+		text=hovertext
+		)
 	]
 
 	layout = go.Layout(
-	    title='Births per date from 1994-2014',
-	    xaxis = dict(ticks='', nticks=31),
-	    yaxis = dict(ticks='' )
+		title='Births per date from 1994-2014',
+		xaxis = dict(ticks='', nticks=31),
+		yaxis = dict(ticks='' )
 	)
 
 	fig = go.Figure(data=data, layout=layout)
@@ -154,15 +180,6 @@ def get_combined_day_births(datafile):
 	sums = [sum(z_sub) for z_sub in z]
 	pprint(sums)
 
-	# births = {month: births[month]/100000 for month in births}
-	# lists = births.items() # sorted by key, return a list of tuples
-	# x, y = zip(*lists) # unpack a list of pairs into two tuples
-	# plt.plot(x, y)
-	# plt.xlabel('Day')
-	# plt.ylabel('Births in hundred thousand')
-	# plt.title('Total births on a day across 1994-2014')
-	# #plt.ylim([6,8])
-	# plt.show()
 
 plot = True
 
@@ -173,3 +190,4 @@ datafile = data_dir + 'data.json'
 #get_yearly_births(datafile, plot)
 #get_year_distribution(datafile, 2009)
 get_combined_day_births(datafile)
+#get_combined_monthly_births(datafile)
