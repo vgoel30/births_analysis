@@ -201,7 +201,6 @@ def get_day_distribution(datafile):
 		plt.bar(list(births.keys()), births.values())
 		plt.show()
 
-
 def friday_thirteen_special(datafile, val1 = 6, val2 = 20):
 	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 	#store info about births on date val1. Each key is the day that the 13th was
@@ -253,7 +252,7 @@ data_dir = '../data/'
 datafile = data_dir + 'data.json'
 # year_births = get_yearly_births(datafile, plot=plot)
 # pprint(year_births)
-#get_yearly_births(datafile, plot)
+get_yearly_births(datafile, plot)
 #get_year_distribution(datafile, 2009)
 #get_combined_day_births(datafile)
-friday_thirteen_special(datafile, val1, val2)
+#friday_thirteen_special(datafile, val1, val2)
