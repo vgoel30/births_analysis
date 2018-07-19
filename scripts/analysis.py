@@ -230,10 +230,6 @@ def friday_thirteen_special(datafile, val1 = 6, val2 = 20):
 						elif int(date) == val2:
 							next_[int(day)] += births
 
-	pprint(prev)
-	pprint(thirteenth)
-	pprint(next_)
-
 	avgs = [((prev[i] + next_[i])//2) - thirteenth[i] for i in range(1, 8)]
 	avgs_dict = {days[i]:-avgs[i]/1000 for i in range(0, 7)}
 	pprint(avgs_dict)
@@ -244,6 +240,35 @@ def friday_thirteen_special(datafile, val1 = 6, val2 = 20):
 	plt.ylim([-30,0])
 	plt.show()
 
+def compare_fridays(datafile):
+	births = {i : 0 for i in range(1, 32)}
+	counts = {i : 0 for i in range(1, 32)}
+
+	with open(datafile) as f:
+		data = json.load(f)
+
+		for year in data:
+			year_data = data[year]
+			for month in year_data:
+				month_data = year_data[month]
+				for date in month_data:
+					day = month_data[date]['day']
+					if day == 5:
+						num_births = month_data[date]['births']
+						births[int(date)] += num_births
+						counts[int(date)] += 1
+
+	avgs_dict = {i : (births[i]/counts[i])/10000 for i in range(1, 32)}
+	plt.ylabel('Average births per day (in ten thousand)')
+	plt.title('Comparison of average number of births on Fridays of each date')
+	plt.xlabel('Date')
+	lists = sorted(avgs_dict.items()) # sorted by key, return a list of tuples
+	x, y = zip(*lists) # unpack a list of pairs into two tuples
+	plt.plot(x, y,marker='o')
+	#plt.bar(list(avgs_dict.keys()), avgs_dict.values())
+	plt.ylim([0,1.5])
+	plt.show()
+
 val1 = 6
 val2 = 20
 
@@ -252,7 +277,8 @@ data_dir = '../data/'
 datafile = data_dir + 'data.json'
 # year_births = get_yearly_births(datafile, plot=plot)
 # pprint(year_births)
-get_yearly_births(datafile, plot)
+#get_yearly_births(datafile, plot)
 #get_year_distribution(datafile, 2009)
 #get_combined_day_births(datafile)
 #friday_thirteen_special(datafile, val1, val2)
+compare_fridays(datafile)
