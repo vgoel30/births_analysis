@@ -175,7 +175,7 @@ def get_combined_day_births(datafile):
 	# sums = [sum(z_sub) for z_sub in z]
 	# pprint(sums)
 
-def get_day_info(datafile):
+def get_day_distribution(datafile):
 	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 	births = {i : 0 for i in range(1, 8)}
 	with open(datafile) as f:
@@ -192,17 +192,61 @@ def get_day_info(datafile):
 		
 		births = {days[i - 1] : births[i] for i in range(1, 8)}
 
-		total = sum(births.values())
-		births = {day:(births[day]/total) * 100 for day in births}
+		total = 1000000
+		births = {day:(births[day]/total) for day in births}
 
-		#lists = sorted(births.items()) # sorted by key, return a list of tuples
-		x, y = zip(*births.items()) # unpack a list of pairs into two tuples
-		plt.plot(x, y,marker='o')
 		plt.xlabel('Day')
-		plt.ylabel('Percentage of births')
-		plt.title('Percentage of births by day in USA from 1994-2014')
-		plt.ylim([0,50])
+		plt.ylabel('Number of births (in millions)')
+		plt.title('Number of births by day in USA from 1994-2014')
+		plt.bar(list(births.keys()), births.values())
 		plt.show()
+
+
+def friday_thirteen_special(datafile, val1 = 6, val2 = 20):
+	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+	#store info about births on date val1. Each key is the day that the 13th was
+	prev = {i : 0 for i in range(1, 8)}
+	#info about 13th
+	thirteenth = {i : 0 for i in range(1, 8)}
+	#info about date val2
+	next_ = {i : 0 for i in range(1, 8)}
+
+	with open(datafile) as f:
+		data = json.load(f)
+
+		for year in data:
+			year_data = data[year]
+			for month in year_data:
+				month_data = year_data[month]
+				for date in month_data:
+					#only considering the 13th of every month
+					day = month_data['13']['day']
+					if int(date) == val1 or int(date) == 13 or int(date) == val2:
+						date_data = month_data[date]
+						births = month_data[date]['births']
+						if int(date) == val1:
+							prev[int(day)] += births
+						elif int(date) == 13:
+							thirteenth[int(day)] += births
+						elif int(date) == val2:
+							next_[int(day)] += births
+
+	pprint(prev)
+	pprint(thirteenth)
+	pprint(next_)
+
+	avgs = [((prev[i] + next_[i])//2) - thirteenth[i] for i in range(1, 8)]
+	avgs_dict = {days[i]:-avgs[i]/1000 for i in range(0, 7)}
+	pprint(avgs_dict)
+	plt.ylabel('Difference (in thousands)')
+	plt.title('Difference in the number of births on 13th and average number of births on 6th and 20th across all months')
+	plt.xlabel('Day')
+	plt.bar(list(avgs_dict.keys()), avgs_dict.values())
+	plt.ylim([-30,0])
+	plt.show()
+
+val1 = 6
+val2 = 20
 
 plot = True
 data_dir = '../data/'
@@ -212,4 +256,4 @@ datafile = data_dir + 'data.json'
 #get_yearly_births(datafile, plot)
 #get_year_distribution(datafile, 2009)
 #get_combined_day_births(datafile)
-get_day_info(datafile)
+friday_thirteen_special(datafile, val1, val2)
