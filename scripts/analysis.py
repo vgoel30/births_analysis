@@ -7,12 +7,11 @@ import numpy as np; np.random.seed(0)
 import matplotlib.pyplot as plt
 import os
 from math import log as ln
-
 import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
-import plotly.figure_factory as ff
 
+#gets the distribution of births (by month) for a particular year and plots it
 def get_year_distribution(datafile, year):
 	year = str(year)
 	with open(datafile) as f:
@@ -36,7 +35,9 @@ def get_year_distribution(datafile, year):
 			plt.ylabel('Births in hundred thousand')
 			plt.title('Monthly births in the year ' + str(year))
 			plt.ylim([2.5,4])
-			plt.show()			
+			plt.show()
+
+		return data_year			
 
 def get_yearly_births(datafile, plot=False):
 	births = {str(i):0 for i in range(1994, 2015)}
@@ -83,7 +84,6 @@ def get_combined_monthly_births(datafile):
 				for date in month_data:
 					month_births += month_data[date]['births']
 				births[month] += month_births
-	pprint(births)
 
 	births = {int(month): births[month]/1000000 for month in births}
 	lists = sorted(births.items()) # sorted by key, return a list of tuples
@@ -134,13 +134,8 @@ def get_combined_day_births(datafile):
 		z.append(new_row)
 
 	#z[1][28] *= 4
-
-	#pprint(z[11])
-	#exit()
 	rank_list.sort()
 	rank_list = rank_list[::-1]
-	# pprint(rank_list)
-	# exit()
 
 	hovertext = list()
 	pprint(months)
@@ -176,18 +171,45 @@ def get_combined_day_births(datafile):
 	fig = go.Figure(data=data, layout=layout)
 	plotly.offline.plot(fig, filename='datetime-heatmap')
 
-	sums = []
-	sums = [sum(z_sub) for z_sub in z]
-	pprint(sums)
+	# sums = []
+	# sums = [sum(z_sub) for z_sub in z]
+	# pprint(sums)
 
+def get_day_info(datafile):
+	days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+	births = {i : 0 for i in range(1, 8)}
+	with open(datafile) as f:
+		data = json.load(f)
+
+		for year in data:
+			year_data = data[year]
+			for month in year_data:
+				month_births = 0
+				month_data = year_data[month]
+				for date in month_data:
+					day = month_data[date]['day']
+					births[int(day)] += month_data[date]['births']
+		
+		births = {days[i - 1] : births[i] for i in range(1, 8)}
+
+		total = sum(births.values())
+		births = {day:(births[day]/total) * 100 for day in births}
+
+		#lists = sorted(births.items()) # sorted by key, return a list of tuples
+		x, y = zip(*births.items()) # unpack a list of pairs into two tuples
+		plt.plot(x, y,marker='o')
+		plt.xlabel('Day')
+		plt.ylabel('Percentage of births')
+		plt.title('Percentage of births by day in USA from 1994-2014')
+		plt.ylim([0,50])
+		plt.show()
 
 plot = True
-
 data_dir = '../data/'
 datafile = data_dir + 'data.json'
 # year_births = get_yearly_births(datafile, plot=plot)
 # pprint(year_births)
 #get_yearly_births(datafile, plot)
 #get_year_distribution(datafile, 2009)
-get_combined_day_births(datafile)
-#get_combined_monthly_births(datafile)
+#get_combined_day_births(datafile)
+get_day_info(datafile)
