@@ -258,15 +258,21 @@ def compare_fridays(datafile):
 						births[int(date)] += num_births
 						counts[int(date)] += 1
 
-	avgs_dict = {i : (births[i]/counts[i])/10000 for i in range(1, 32)}
-	plt.ylabel('Average births per day (in ten thousand)')
-	plt.title('Comparison of average number of births on Fridays of each date')
+	pprint(births)
+	pprint(counts)
+
+	avgs_dict = {i : (births[i]/counts[i]) for i in range(1, 32)}
+	mean = sum(avgs_dict.values())/len(avgs_dict)
+	avgs_dict = {i : avgs_dict[i] - mean for i in range(1, 32)}
+	pprint(avgs_dict)
+	plt.ylabel('Difference in mean')
+	plt.title('Comparison of mean number of births on Fridays of each date to the global mean number of Friday births')
 	plt.xlabel('Date')
 	lists = sorted(avgs_dict.items()) # sorted by key, return a list of tuples
 	x, y = zip(*lists) # unpack a list of pairs into two tuples
 	plt.plot(x, y,marker='o')
 	#plt.bar(list(avgs_dict.keys()), avgs_dict.values())
-	plt.ylim([0,1.5])
+	plt.ylim([-800,800])
 	plt.show()
 
 val1 = 6
