@@ -266,7 +266,7 @@ def compare_fridays(datafile):
 	avgs_dict = {i : avgs_dict[i] - mean for i in range(1, 32)}
 	pprint(avgs_dict)
 	plt.ylabel('Number of births')
-	plt.title('Comparison of mean number of births on Fridays of each date to the global mean number of Friday births')
+	plt.title('Comparison of mean number of births on Fridays of each date to the global mean of Friday births')
 	plt.xlabel('Date')
 	plt.bar(list(avgs_dict.keys()), avgs_dict.values())
 	plt.ylim([-800,800])
